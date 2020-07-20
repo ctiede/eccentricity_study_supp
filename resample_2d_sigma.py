@@ -13,8 +13,8 @@ from eccentricity_study import *
 
 def write_avg_sigma(fname, xy, sig):
     h5f = h5py.File(fname, 'w')
-    h5f.create_dataset('vertices', xy)
-    h5f.create_dataset('sigma'   , sig)
+    h5f.create_dataset('vertices', data=xy)
+    h5f.create_dataset('sigma'   , data=sig)
     h5f.close()
 
 
