@@ -63,7 +63,7 @@ if __name__ == '__main__':
         w   = 1e3 
         if e < 0.1: 
             w = 1e4
-        filename = 'time_avg_sigma_e{}_{}.npy'.format(int(e * w), mod)
+        filename = 'time_avg_sigma_e{}_{}.h5'.format(int(e * w), mod)
         write_avg_sigma(filename, np.column_stack([xb, yb]), sig_avg)
         
         # np.save('resample_vertices.npy', np.column_stack([xb, yb]))
