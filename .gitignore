@@ -16,3 +16,4 @@ figures.py
 get_rvm.py
 *.h5
 *.npy
+*.pdf
