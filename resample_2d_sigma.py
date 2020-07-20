@@ -11,6 +11,13 @@ import matplotlib.pyplot as plt
 from eccentricity_study import *
 
 
+def write_avg_sigma(fname, xy, sig):
+    h5f = h5py.File(fname, 'w')
+    h5f.create_dataset('vertices', xy)
+    h5f.create_dataset('sigma'   , sig)
+    h5f.close()
+
+
 if __name__ == '__main__':
     
     parser = ArgumentParser()
@@ -57,8 +64,11 @@ if __name__ == '__main__':
         if e < 0.1: 
             w = 1e4
         filename = 'time_avg_sigma_e{}_{}.npy'.format(int(e * w), mod)
-        np.save(filename, sig_avg)
+        write_avg_sigma(filename, np.column_stack([xb, yb]), sig_avg)
         
+        # np.save('resample_vertices.npy', np.column_stack([xb, yb]))
+        # np.save(filename, sig_avg)
+
 
 
 
