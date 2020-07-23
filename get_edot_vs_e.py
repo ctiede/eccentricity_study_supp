@@ -73,17 +73,12 @@ if __name__ == '__main__':
     decc = []
     for f in args.filenames:
         print(f)
-        s     = Signal(f, saturation_orbit=1200, completion_orbit=1400)
-        e     = s.e
-        M     = s.M_acc
-        e_acc = s.e_acc
-        e_grv = s.e_grv
-        e_tot = e_grv + e_acc
-        dm    = M[-1] - M[0]
-        de    = e_tot[-1] - e_tot[0])
+        s  = Signal(f, saturation_orbit=1200, completion_orbit=1400)
+        e  = s.e
+        de = s.de_acc + s.de_grv
 
         ecc.append (e)
-        decc.append(de / dm)
+        decc.append(de)
         np.save('e_de.npy', np.column_stack([ecc, decc]))
 
 
