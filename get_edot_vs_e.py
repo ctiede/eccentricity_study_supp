@@ -1,4 +1,3 @@
-
 from argparse import ArgumentParser
 import os
 import pickle
@@ -9,6 +8,8 @@ import scipy.optimize
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from eccentricity_study import *
+
+
 
 
 class Signal:
@@ -64,15 +65,15 @@ class Signal:
 
 
 
+
 if __name__ == '__main__':
-    
     parser = ArgumentParser()
     parser.add_argument("filenames", nargs='+')
     args = parser.parse_args()
-    
     ecc  = []
     decc = []
     edot = []
+
     for f in args.filenames:
         print(f)
         s  = Signal(f, saturation_orbit=1200, completion_orbit=1400)
@@ -84,14 +85,3 @@ if __name__ == '__main__':
         decc.append(  de)
         edot.append(dedt)
         np.save('e_de_dM.npy', np.column_stack([ecc, decc, edot]))
-
-
-
-        
-
-
-
-
-
-
-

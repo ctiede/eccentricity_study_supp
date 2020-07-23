@@ -1,4 +1,3 @@
-
 import os
 import pickle
 import math
@@ -86,7 +85,7 @@ def get_dataset(fname, key):
     if key == 'cell_area':
         return np.array([helpers.area_array(g[...]) for g in h5f['vertices'].values()])
 
-    if key == 'mass':
+    if key == 'cell_mass':
         return get_dataset(fname, 'sigma') * get_dataset(fname, 'cell_area')
 
     if key == 'x_velocity':
@@ -104,15 +103,20 @@ def get_dataset(fname, key):
     raise KeyError('unknown dataset: ' + key)
 
 
-#------------------------------------------------------------------------------
+
+
 def softening_radius(fname):
     h5f = h5py.File(fname, 'r')
     return h5f['run_config']['softening_radius'][()]
 
 
+
+
 def eccentricity_value(fname):
     h5f = h5py.File(fname, 'r')
     return h5f['run_config']['eccentricity'][()]
+
+
 
 
 def two_body_position_and_velocity(E, M=1.0, a=1.0, q=1.0, e=0.0):
@@ -131,10 +135,14 @@ def two_body_position_and_velocity(E, M=1.0, a=1.0, q=1.0, e=0.0):
     return np.array([x1, y1]), np.array([x2, y2]), np.array([vx1, vy1]), np.array([vx2, vy2])
 
 
+
+
 def E_from_M(M, e=1.0):
     f = lambda E: E - e * np.sin(E) - M
     E = scipy.optimize.newton(f, x0=M)
     return E
+
+
 
 
 def get_eccentric_anomaly(fname):
@@ -146,15 +154,21 @@ def get_eccentric_anomaly(fname):
     return E
 
 
+
+
 def get_mean_anomaly(fname):
     h5f = h5py.File(fname, 'r')
     t = h5f['time'][...]
     return t % (2 * np.pi)
 
+
+
 def get_true_anomaly(fname):
     e = eccentricity_value   (fname)
     E = get_eccentric_anomaly(fname)
     return math.atan2(np.sin(E), np.sqrt(1 - e * e) * np.cos(E) - e)
+
+
 
 def true_anomaly_from_eE(e, E):
     return math.atan2(np.sin(E), np.sqrt(1 - e * e) * np.cos(E) - e)
