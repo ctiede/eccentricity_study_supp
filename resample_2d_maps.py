@@ -101,7 +101,7 @@ if __name__ == '__main__':
         Yr = X * np.sin(-nu) + Y * np.cos(-nu)
 
         A, xb, yb = np.histogram2d(Xr.flatten(), Yr.flatten(), weights=       (dA).flatten(), bins=bins)
-        M, xb, yb = np.histogram2d(Xr.flatten(), Yr.flatten(), weights= (dA * sig).flatten(), bins=bins)
+        M, xb, yb = np.histogram2d(Xr.flatten(), Yr.flatten(), weights=(dA *  sig).flatten(), bins=bins)
         Q, xb, yb = np.histogram2d(Xr.flatten(), Yr.flatten(), weights=(dA * edot).flatten(), bins=bins)
         A[A==0.0] = 1.0
 
