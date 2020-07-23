@@ -72,24 +72,18 @@ if __name__ == '__main__':
     
     ecc  = []
     decc = []
-    Mdot = []
+    edot = []
     for f in args.filenames:
         print(f)
         s  = Signal(f, saturation_orbit=1200, completion_orbit=1400)
         e  = s.e
         de = s.de_acc + s.de_grv
-        
-        M  = s.M_acc
-        t  = s.orbits
-        dM = s.dm
-        dt = s.dt
+        dedt = de * s.dm / s.dt
 
-        mdot = M[-1] / t[-1]
-        ecc.append ( e)
-        decc.append(de)
-        # Mdot.append(dM / dt)
-        Mdot.append(mdot)
-        np.save('e_de_dM.npy', np.column_stack([ecc, decc, Mdot]))
+        ecc.append (   e)
+        decc.append(  de)
+        edot.append(dedt)
+        np.save('e_de_dM.npy', np.column_stack([ecc, decc, edot]))
 
 
 
