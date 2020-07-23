@@ -31,6 +31,7 @@ class Signal:
         self.isat = isat
         self.ifin = ifin
         self.dm = dm
+        self.dt = (self.orbits[ifin] - self.orbits[isat]) * 2 * np.pi
         self.da_acc = (self.a_acc[ifin] - self.a_acc[isat]) / dm
         self.da_grv = (self.a_grv[ifin] - self.a_grv[isat]) / dm
         self.de_acc = (self.e_acc[ifin] - self.e_acc[isat]) / dm
@@ -69,20 +70,22 @@ if __name__ == '__main__':
     parser.add_argument("filenames", nargs='+')
     args = parser.parse_args()
     
-    ecc   = []
-    decc  = []
-    dMass = []
+    ecc  = []
+    decc = []
+    Mdot = []
     for f in args.filenames:
         print(f)
         s  = Signal(f, saturation_orbit=1200, completion_orbit=1400)
         e  = s.e
         de = s.de_acc + s.de_grv
         dM = s.dm
+        dt = s.dt
 
-        ecc.append  ( e)
-        decc.append (de)
-        dMass.append(dM)
-        np.save('e_de.npy', np.column_stack([ecc, decc, dMass]))
+
+        ecc.append ( e)
+        decc.append(de)
+        Mdot.append(dM / dt)
+        np.save('e_de_dM.npy', np.column_stack([ecc, decc, Mdot]))
 
 
 
