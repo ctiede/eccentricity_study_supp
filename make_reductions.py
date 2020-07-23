@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from argparse import ArgumentParser
 import os
 import numpy as np
@@ -8,7 +10,7 @@ from eccentricity_study import *
 
 
 def energy(e, M=1.0, a=1.0, mu=0.25):
-    return - mu * M / 2. / a
+    return -mu * M / 2. / a
 
 
 
@@ -79,21 +81,21 @@ def get_radial_distributions(fname, nbins):
 
 
 def get_2d_maps(fname, nbins):
-    X   = get_dataset(f, 'x')
-    Y   = get_dataset(f, 'y')
-    sig = get_dataset(f, 'sigma')
-    dA  = get_dataset(f, 'cell_area')
-    dM  = get_dataset(f, 'cell_mass')
+    X   = get_dataset(fname, 'x')
+    Y   = get_dataset(fname, 'y')
+    sig = get_dataset(fname, 'sigma')
+    dA  = get_dataset(fname, 'cell_area')
+    dM  = get_dataset(fname, 'cell_mass')
 
-    e  = eccentricity_value(f)
-    E  = get_eccentric_anomaly(f)
-    rs = softening_radius(f)
+    e  = eccentricity_value(fname)
+    E  = get_eccentric_anomaly(fname)
+    rs = softening_radius(fname)
     xh1, xh2, vh1, vh2 = two_body_position_and_velocity(E, e=e)
 
     t = r_cross_F(xh1, xh2, np.array([X, Y]), dM, rs)           / ang_mom(e)
     p = F_dot_v  (xh1, xh2, vh1, vh2, np.array([X, Y]), dM, rs) / energy(e) / 2.
 
-    nu = get_true_anomaly(f)
+    nu = get_true_anomaly(fname)
     Xr = X * np.cos(-nu) - Y * np.sin(-nu)
     Yr = X * np.sin(-nu) + Y * np.cos(-nu)
 
@@ -128,34 +130,28 @@ def get_moments(fname, rin, rout):
 if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument("filenames", nargs='+')
-    parser.add_argument("--bins-radial", type=int, default=250)
-    parser.add_argument("--bins-2dmap"    , type=int, default=250)
-    parser.add_argument("--moment-cut-in" , '-in' , type=float, default=1.5)
-    parser.add_argument("--moment-cut-out", '-out', type=float, default=5.0)
-
+    parser.add_argument("--bins-radial",    default=250)
+    parser.add_argument("--bins-2dmap"    , default=250)
+    parser.add_argument("--moment-cut-in" , default=1.5)
+    parser.add_argument("--moment-cut-out", default=5.0)
     args = parser.parse_args()
 
-    for f in args.filenames:
-        print(f)
+    reductions_functions = {
+        'radial distributions':                  lambda f: get_radial_distributions(f, args.bins_radial),
+        'radial velocity and sigma moments':     lambda f: get_moments(f, args.moment_cut_in, args.moment_cut_out),
+        'resampled 2D sigma, torque, and power': lambda f: get_2d_maps(f, args.bins_2dmap),
+    }
 
-        print('\t radial dists')
-        dsets = get_radial_distributions(f, args.bins_radial)
+    for fname in args.filenames:
+        print(fname)
+        dsets = dict()
 
-        print('\t moments')
-        dsets.update(get_moments(f, args.moment_cut_in, args.moment_cut_out))
+        for description, func in reductions_functions.items():
+            print(f'\t{description}')
+            dsets.update(func(fname))
 
-        print('\t 2D_maps')
-        dsets.update(get_2d_maps(f, args.bins_2dmap))
-
-        #----------------------------------------------------------------------
-        output_filename = f.replace('diagnostics', 'reductions')
+        output_filename = fname.replace('diagnostics', 'reductions')
         h5f = h5py.File(output_filename, 'w')
 
         for key, value in dsets.items():
             h5f[key] = value
-
-
-
-
-
-
