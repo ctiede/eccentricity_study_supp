@@ -76,10 +76,11 @@ if __name__ == '__main__':
         s  = Signal(f, saturation_orbit=1200, completion_orbit=1400)
         e  = s.e
         de = s.de_acc + s.de_grv
+        dM = s.dm
 
         ecc.append (e)
         decc.append(de)
-        np.save('e_de.npy', np.column_stack([ecc, decc]))
+        np.save('e_de.npy', np.column_stack([ecc, decc, dM]))
 
 
 
