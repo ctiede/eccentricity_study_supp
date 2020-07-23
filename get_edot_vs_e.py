@@ -69,8 +69,9 @@ if __name__ == '__main__':
     parser.add_argument("filenames", nargs='+')
     args = parser.parse_args()
     
-    ecc  = []
-    decc = []
+    ecc   = []
+    decc  = []
+    dMass = []
     for f in args.filenames:
         print(f)
         s  = Signal(f, saturation_orbit=1200, completion_orbit=1400)
@@ -78,9 +79,10 @@ if __name__ == '__main__':
         de = s.de_acc + s.de_grv
         dM = s.dm
 
-        ecc.append (e)
-        decc.append(de)
-        np.save('e_de.npy', np.column_stack([ecc, decc, dM]))
+        ecc.append  ( e)
+        decc.append (de)
+        dMass.append(dM)
+        np.save('e_de.npy', np.column_stack([ecc, decc, dMass]))
 
 
 
