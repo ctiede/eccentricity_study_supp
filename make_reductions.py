@@ -129,7 +129,7 @@ if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument("filenames", nargs='+')
     parser.add_argument("--bins-radial", type=int, default=250)
-    parser.add_argument("--bins-2dmap"    , type=int, default=250)
+    parser.add_argument("--bins-2dmap"    , type=int, default=200)
     parser.add_argument("--moment-cut-in" , '-in' , type=float, default=1.5)
     parser.add_argument("--moment-cut-out", '-out', type=float, default=5.0)
 
