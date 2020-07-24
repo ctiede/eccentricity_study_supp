@@ -147,7 +147,7 @@ if __name__ == '__main__':
         dsets = dict()
 
         for description, func in reductions_functions.items():
-            print(f'\t{description}')
+            # print(f'\t{description}')
             dsets.update(func(fname))
 
         if len(fname.split('/')) == 1:
