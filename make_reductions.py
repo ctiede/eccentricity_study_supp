@@ -66,11 +66,11 @@ def get_radial_distributions(fname, nbins):
     T = r_cross_F(xh1, xh2, np.array([X, Y]), dM, rs)
     W = F_dot_v  (xh1, xh2, vh1, vh2, np.array([X, Y]), dM, rs)
 
-    bins = np.linspace(0.0, rd, nbins + 1)
-    A , _ = np.histogram(R, bins=bins, weights=dA)
-    M , _ = np.histogram(R, bins=bins, weights=dM)
-    dE, _ = np.histogram(R, bins=bins, weights=W)
-    dL, _ = np.histogram(R, bins=bins, weights=T)
+    bins  = np.linspace(0.0, rd, nbins + 1)
+    A , _ = np.histogram(R, weights=dA, bins=bins)
+    M , _ = np.histogram(R, weights=dM, bins=bins)
+    dE, _ = np.histogram(R, weights=W , bins=bins)
+    dL, _ = np.histogram(R, weights=T , bins=bins)
 
     if (A == 0.0).any():
         raise RuntimeError('Warning: there were empty radial bins. Re-run with a smaller bin count.')
@@ -130,10 +130,10 @@ def get_moments(fname, rin, rout):
 if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument("filenames", nargs='+')
-    parser.add_argument("--bins-radial",    default=250)
-    parser.add_argument("--bins-2dmap"    , default=250)
-    parser.add_argument("--moment-cut-in" , default=1.5)
-    parser.add_argument("--moment-cut-out", default=5.0)
+    parser.add_argument("--bins-radial"   , type=int  , default=250)
+    parser.add_argument("--bins-2dmap"    , type=int  , default=250)
+    parser.add_argument("--moment-cut-in" , type=float, default=1.5)
+    parser.add_argument("--moment-cut-out", type=float, default=5.0)
     args = parser.parse_args()
 
     reductions_functions = {
@@ -150,7 +150,12 @@ if __name__ == '__main__':
             print(f'\t{description}')
             dsets.update(func(fname))
 
-        output_filename = fname.replace('diagnostics', 'reductions')
+        if len(fname.split('/')) == 1:
+            output_filename = fname.replace('diagnostics', 'reductions')
+        else:
+            output_filename = (fname.split('/')[-1]).replace('diagnostics', 'reductions')
+
+        print(f'     writing', output_filename)
         h5f = h5py.File(output_filename, 'w')
 
         for key, value in dsets.items():
