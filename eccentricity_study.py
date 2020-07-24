@@ -112,6 +112,12 @@ def softening_radius(fname):
 
 
 
+def domain_radius(fname):
+    h5f = h5py.File(fname, 'r')
+    return h5f['run_config']['domain_radius'][()]
+
+
+
 def eccentricity_value(fname):
     h5f = h5py.File(fname, 'r')
     return h5f['run_config']['eccentricity'][()]
