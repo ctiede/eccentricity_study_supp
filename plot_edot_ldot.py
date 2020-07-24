@@ -72,8 +72,10 @@ def plot_edot_ldot_single(ax, M, ecc, r, s, dE, dL):
     lab1 = 'Relative power, ' + r'$-(F_i \cdot v_i) \cdot t_\nu / 2E$'
     lab2 = 'Relative torque, ' + r'$\,(r_i \times F_i)_z \cdot t_\nu / L$'
 
-    plot_moving_average_mod(ax, r[mask], Edot, lw=2, color=red , label=lab1)
-    plot_moving_average_mod(ax, r[mask], Ldot, lw=2, color=blue, label=lab2)
+    # plot_moving_average_mod(ax, r[mask], Edot, lw=2, color=red , label=lab1)
+    # plot_moving_average_mod(ax, r[mask], Ldot, lw=2, color=blue, label=lab2)
+    ax.plot(r[mask], Edot, lw=2, color=red , label=lab1)
+    ax.plot(r[mask], Ldot, lw=2, color=blue, label=lab2)
     plot_cumsum(ax, r[mask], Edot - Ldot, ls='--', lw=0.75, color='violet', label='Cumulative difference, ' + r'$\dot e$')
 
 
