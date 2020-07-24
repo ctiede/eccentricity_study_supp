@@ -22,10 +22,10 @@ def ang_mom(e, M=1.0, a=1.0, mu=0.25):
 
 
 def r_cross_F(xh1, xh2, loc, mass, rsoft):
-    y1 = loc - xh1[:, None, None, None]
-    y2 = loc - xh2[:, None, None, None]
-    r1 = np.sqrt(y1[0] * y1[0] + y1[1] * y1[1])
-    r2 = np.sqrt(y2[0] * y2[0] + y2[1] * y2[1])
+    y1  = loc - xh1[:, None, None, None]
+    y2  = loc - xh2[:, None, None, None]
+    r1  = np.sqrt(y1[0] * y1[0] + y1[1] * y1[1])
+    r2  = np.sqrt(y2[0] * y2[0] + y2[1] * y2[1])
     fg1 = (mass / pow(r1**2 + rsoft**2, 3. / 2.)) * y1
     fg2 = (mass / pow(r2**2 + rsoft**2, 3. / 2.)) * y2
     tg1 = np.cross(xh1, fg1, axis=0)
@@ -36,10 +36,10 @@ def r_cross_F(xh1, xh2, loc, mass, rsoft):
 
 
 def F_dot_v(xh1, xh2, vh1, vh2, loc, mass, rsoft):
-    y1 = loc - xh1[:, None, None, None]
-    y2 = loc - xh2[:, None, None, None]
-    r1 = np.sqrt(y1[0] * y1[0] + y1[1] * y1[1])
-    r2 = np.sqrt(y2[0] * y2[0] + y2[1] * y2[1])
+    y1  = loc - xh1[:, None, None, None]
+    y2  = loc - xh2[:, None, None, None]
+    r1  = np.sqrt(y1[0] * y1[0] + y1[1] * y1[1])
+    r2  = np.sqrt(y2[0] * y2[0] + y2[1] * y2[1])
     fg1 = (mass / pow(r1**2 + rsoft**2, 3. / 2.)) * y1
     fg2 = (mass / pow(r2**2 + rsoft**2, 3. / 2.)) * y2
     wg1 = np.tensordot(vh1, fg1, axes=1)
@@ -101,10 +101,10 @@ def get_2d_maps(fname, nbins):
 
     rlim = 5
     bins = np.linspace(-rlim, rlim, nbins + 1)
-    A, xb, yb = np.histogram2d(Xr.flatten(), Yr.flatten(), weights=dA.flatten(), bins=[bins, bins])
-    M, xb, yb = np.histogram2d(Xr.flatten(), Yr.flatten(), weights=dM.flatten(), bins=[bins, bins])
-    T, xb, yb = np.histogram2d(Xr.flatten(), Yr.flatten(), weights=t.flatten() , bins=[bins, bins])
-    P, xb, yb = np.histogram2d(Xr.flatten(), Yr.flatten(), weights=p.flatten() , bins=[bins, bins])
+    A, _x, _y = np.histogram2d(Xr.flatten(), Yr.flatten(), weights=dA.flatten(), bins=[bins, bins])
+    M, _x, _y = np.histogram2d(Xr.flatten(), Yr.flatten(), weights=dM.flatten(), bins=[bins, bins])
+    T, _x, _y = np.histogram2d(Xr.flatten(), Yr.flatten(), weights=t.flatten() , bins=[bins, bins])
+    P, _x, _y = np.histogram2d(Xr.flatten(), Yr.flatten(), weights=p.flatten() , bins=[bins, bins])
     A[A==0.0] = 1.0
 
     return dict(remapped_sigma=M / A, remapped_Ldot=T / A, remapped_Edot=P / A)
