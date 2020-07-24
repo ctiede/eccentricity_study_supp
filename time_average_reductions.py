@@ -60,7 +60,7 @@ for fname in args.filenames:
     vr_moment.append        (ev)
 
 if e < 0.1:
-    ecc = str(e).split('/')[-1]
+    ecc = str(e).split('.')[-1]
 else:
     ecc = str(int(e * 1e3))
 output_fname = 'time_averages_{}.h5'.format(ecc)
