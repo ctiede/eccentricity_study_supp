@@ -107,7 +107,7 @@ def get_2d_maps(fname, nbins):
     P, _x, _y = np.histogram2d(Xr.flatten(), Yr.flatten(), weights=p.flatten() , bins=[bins, bins])
     A[A==0.0] = 1.0
 
-    return dict(remapped_sigma=M / A, remapped_Ldot=T / A, remapped_Edot=P / A)
+    return dict(bins2d=bins, remapped_sigma=M / A, remapped_Ldot=T / A, remapped_Edot=P / A)
 
 
 
