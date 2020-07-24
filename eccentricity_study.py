@@ -169,12 +169,14 @@ def get_mean_anomaly(fname):
 
 
 
+
 def get_true_anomaly(fname):
     e = eccentricity_value   (fname)
     E = get_eccentric_anomaly(fname)
-    return math.atan2(np.sin(E), np.sqrt(1 - e * e) * np.cos(E) - e)
+    return 2 * math.atan2(np.sqrt(1 + e) * math.tan(E / 2.), np.sqrt(1 - e))
+
 
 
 
 def true_anomaly_from_eE(e, E):
-    return math.atan2(np.sin(E), np.sqrt(1 - e * e) * np.cos(E) - e)
+    return 2 * math.atan2(np.sqrt(1 + e) * math.tan(E / 2.), np.sqrt(1 - e))
