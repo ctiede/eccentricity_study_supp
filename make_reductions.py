@@ -127,6 +127,15 @@ def get_moments(fname, rin, rout):
 
 
 
+def meta_data(fname):
+    e = eccentricity_value   (fname)
+    M = get_mean_anomaly     (fname)
+    E = get_eccentric_anomaly(fname)
+    f = get_true_anomaly     (fname)
+    return dict(eccentricity=e, mean_anomaly=M, eccentric_anomaly=E, true_anomaly=f)
+
+
+
 if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument("filenames", nargs='+')
@@ -158,5 +167,6 @@ if __name__ == '__main__':
         print(f'     writing', output_filename)
         h5f = h5py.File(output_filename, 'w')
 
+        dsets.update(meta_data(fname))
         for key, value in dsets.items():
             h5f[key] = value
