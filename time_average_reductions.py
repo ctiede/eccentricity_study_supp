@@ -3,14 +3,15 @@
 from argparse import ArgumentParser
 import os
 import h5py
+import glob
 import numpy as np
 from eccentricity_study import *
 
 
 parser = ArgumentParser()
-parser.add_argument("filenames", nargs='+')
-args = parser.parse_args()
-
+parser.add_argument("directory", default='./')
+args  = parser.parse_args()
+files = sorted(glob.glob(args.directory + 'reductions.*.h5', recursive=False))
 
 mean_anomaly      = []
 eccentric_anomaly = []
@@ -24,7 +25,7 @@ remapped_Edot     = []
 sigma_moment      = []
 vr_moment         = []
 
-for fname in args.filenames:
+for fname in files:
     print(fname)
     
     h5f = h5py.File(fname, 'r')
@@ -65,18 +66,18 @@ else:
     ecc = str(int(e * 1e3))
 output_fname = 'time_averages_{}.h5'.format(ecc)
 
-h5o = h5py.File(output_fname, 'w')
-h5o['eccentricity']      = e
-h5o['radial_bins']       = n
-h5o['mean_anomaly']      = np.array(mean_anomaly) 
-h5o['eccentric_anomaly'] = np.array(eccentric_anomaly)
-h5o['true_anomaly']      = np.array(true_anomaly)
-h5o['sigma_moment']      = np.array(sigma_moment)
-h5o['vr_moment']         = np.array(vr_moment)
-h5o['sigma']             = np.row_stack(sigma)
-h5o['work_on']           = np.row_stack(work_on)
-h5o['torque_on']         = np.row_stack(torque_on)
-h5o['remapped_sigma']    = np.dstack(remapped_sigma)
-h5o['remapped_Ldot']     = np.dstack(remapped_Ldot)
-h5o['remapped_Edot']     = np.dstack(remapped_Edot)
+h5w = h5py.File(output_fname, 'w')
+h5w['eccentricity']      = e
+h5w['radial_bins']       = n
+h5w['mean_anomaly']      = np.array(mean_anomaly) 
+h5w['eccentric_anomaly'] = np.array(eccentric_anomaly)
+h5w['true_anomaly']      = np.array(true_anomaly)
+h5w['sigma_moment']      = np.array(sigma_moment)
+h5w['vr_moment']         = np.array(vr_moment)
+h5w['sigma']             = np.row_stack(sigma)
+h5w['work_on']           = np.row_stack(work_on)
+h5w['torque_on']         = np.row_stack(torque_on)
+h5w['remapped_sigma']    = np.dstack(remapped_sigma)
+h5w['remapped_Ldot']     = np.dstack(remapped_Ldot)
+h5w['remapped_Edot']     = np.dstack(remapped_Edot)
 
