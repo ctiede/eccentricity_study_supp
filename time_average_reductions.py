@@ -79,4 +79,3 @@ h5o['torque_on']         = np.row_stack(torque_on)
 h5o['remapped_sigma']    = np.dstack(remapped_sigma)
 h5o['remapped_Ldot']     = np.dstack(remapped_Ldot)
 h5o['remapped_Edot']     = np.dstack(remapped_Edot)
-
