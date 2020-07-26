@@ -28,7 +28,11 @@ vr_moment         = []
 for fname in files:
     print(fname)
     
-    h5f = h5py.File(fname, 'r')
+    try:
+        h5f = h5py.File(fname, 'r')
+    except:
+        print("\t Failed load:", fname)
+        continue
 
     e = h5f['eccentricity'     ][...]
     M = h5f['mean_anomaly'     ][...]
@@ -66,6 +70,7 @@ else:
     ecc = str(int(e * 1e3))
 output_fname = 'time_averages_{}.h5'.format(ecc)
 
+print('   Writing output')
 h5w = h5py.File(output_fname, 'w')
 h5w['eccentricity']      = e
 h5w['radial_bins']       = n
