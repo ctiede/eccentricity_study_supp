@@ -39,6 +39,19 @@ def L(e, M=1.0, a=1.0, mu=0.25):
 
 
 
+def midpoint(x):
+    return (x[:-1] + x[1:]) / 2
+
+
+
+
+def smooth(A):
+    A = np.array(A)
+    return np.array([A[0]] + list((A[2:] + A[1:-1] + A[:-2]) / 3) + [A[-1]])
+
+
+
+
 def moving_average(a, window_size=10):
     n = window_size
     ret = np.cumsum(a, dtype=float)
@@ -57,26 +70,26 @@ def plot_moving_average_mod(ax, x, y, window_size=50, avg_only=True, c=None, **k
 
 
 def plot_cumsum(ax, x, y, c=None, **kwargs):
-    ax.fill_between(x, np.cumsum(y), facecolor=c, alpha=0.2)
+    ax.fill_between(x, np.cumsum(y), facecolor='purple', alpha=0.1)
     return ax.plot(x, np.cumsum(y), c=c, **kwargs)
 
 
 
 
-def plot_edot_ldot_single(ax, M, ecc, r, s, dE, dL):
-    mask = r < 8    
+def plot_edot_ldot_single(ax, M, ecc, r, s, dE, dL, de):
     print(dE.shape)
 
-    Edot = np.mean(dE, axis=0)[mask] / E(ecc) / 2. * t_nu / rbin
-    Ldot = np.mean(dL, axis=0)[mask] / L(ecc)      * t_nu / rbin
+    Edot = dE / E(ecc) / 2. * t_nu #/ rbin
+    Ldot = dL / L(ecc)      * t_nu #/ rbin
     lab1 = 'Relative power, ' + r'$-(F_i \cdot v_i) \cdot t_\nu / 2E$'
     lab2 = 'Relative torque, ' + r'$\,(r_i \times F_i)_z \cdot t_\nu / L$'
 
-    # plot_moving_average_mod(ax, r[mask], Edot, lw=2, color=red , label=lab1)
-    # plot_moving_average_mod(ax, r[mask], Ldot, lw=2, color=blue, label=lab2)
-    ax.plot(r[mask], Edot, lw=2, color=red , label=lab1)
-    ax.plot(r[mask], Ldot, lw=2, color=blue, label=lab2)
-    plot_cumsum(ax, r[mask], Edot - Ldot, ls='--', lw=0.75, color='violet', label='Cumulative difference, ' + r'$\dot e$')
+    # ax.plot(midpoint(r), smooth(Edot), lw=2, color=red , label=lab1)
+    # ax.plot(midpoint(r), smooth(Ldot), lw=2, color=blue, label=lab2)
+    plot_moving_average_mod(ax, midpoint(r), Edot, lw=2, color=red , label=lab1, window_size=10)
+    plot_moving_average_mod(ax, midpoint(r), Ldot, lw=2, color=blue, label=lab2, window_size=10)
+    plot_cumsum(ax, midpoint(r), Edot - Ldot, ls='--', lw=0.75, color='purple', label='Cumulative difference, ' + r'$\dot e$')
+    ax.axhline(de * ecc / (1 - ecc**2) * t_nu, color='green', ls='--', label='Timeseries data, ' + r'$\dot e \cdot e t_\nu  / (1 - e^2)$')
 
 
 
@@ -86,9 +99,9 @@ def config_axes(axs, key, ecc):
         ax.axhline(0.0, ls=':', color='grey', lw=0.75, alpha=0.7)
         ax.text(1.01, 0.5, r'e = ' + str(e), transform=ax.transAxes, rotation=90)
         ax.set_xlim([ 0.0 , 5.0])
-        ax.set_ylim([-0.25, 0.25])
-        ax.set_yticks([-0.15, 0.0, 0.15])
-
+        ax.set_ylim([-0.0023, 0.0023])
+        ax.set_yticks([-0.0015, 0.0, 0.0015])
+        # ax.set_ylim([-0.25, 0.25])
     if key == 'u':
         axs[0].text(0.02, 1.02, r'Mean anomaly = $\pi$ / 2', transform=axs[0].transAxes)
     if key == 'd':
@@ -113,6 +126,17 @@ def load_radial_timeseries(fname):
 
 
 
+def load_radial_data(fname):
+    h5f = h5py.File(fname, 'r')
+    r   = h5f['radial_bins'][...]
+    s   = h5f['sigma'      ][...]
+    P   = h5f['work_on'    ][...]
+    T   = h5f['torque_on'  ][...]
+    return r, s, P, T
+
+
+
+
 def get_radial_series(key):
     if key == 'u':
         M    = np.pi / 2.
@@ -131,13 +155,13 @@ def get_radial_series(key):
     if key == 'f':
         M    = None
         ecc  = [0.025, 0.1, 0.3, 0.4, 0.5, 0.6, 0.75]
-        e025 = load_radial_timeseries('./e025_full/radial_timeseries_e250_f.h5')
-        e100 = load_radial_timeseries('./e100_full/radial_timeseries_e100_f.h5')
-        e300 = load_radial_timeseries('./e300_full/radial_timeseries_e300_f.h5')
-        e400 = load_radial_timeseries('./e400_full/radial_timeseries_e400_f.h5')
-        e500 = load_radial_timeseries('./e500_full/radial_timeseries_e500_f.h5')
-        e600 = load_radial_timeseries('./e600_full/radial_timeseries_e600_f.h5')
-        e750 = load_radial_timeseries('./e750_full/radial_timeseries_e750_f.h5')
+        e025 = load_radial_data('./Data/time_avg_reductions_025.h5')
+        e100 = load_radial_data('./Data/time_avg_reductions_100.h5')
+        e300 = load_radial_data('./Data/time_avg_reductions_300.h5')
+        e400 = load_radial_data('./Data/time_avg_reductions_400.h5')
+        e500 = load_radial_data('./Data/time_avg_reductions_500.h5')
+        e600 = load_radial_data('./Data/time_avg_reductions_600.h5')
+        e750 = load_radial_data('./Data/time_avg_reductions_750.h5')
         data = [e025, e100, e300, e400, e500, e600, e750]
     return M, ecc, data
 
@@ -145,16 +169,23 @@ def get_radial_series(key):
 
 
 def plot_edot_ldot(M, ecc, data, key):
+    e_de_edot = np.load('./Data/e_de_dedt.npy')
+    eee  = e_de_edot[:, 0]
+    decc = e_de_edot[:, 1]
+    edot = e_de_edot[:, 2]
+    # plt.plot(eee, edot * t_nu)
+    # plt.grid()
+    # plt.show()
+    
     fig, axs = plt.subplots(len(ecc), 1, figsize=[8, 12], sharex=True)
-
     for e, ax, dat in zip(ecc, axs, data):
-        plot_edot_ldot_single(ax, M, e, dat[0], dat[1], dat[2], dat[3])
+        plot_edot_ldot_single(ax, M, e, (dat[0]), dat[1], dat[2], dat[3], edot[eee==e])
 
     config_axes(axs, key, ecc)
     axs[0].legend(loc="upper right", fontsize=12)
 
     plt.subplots_adjust(hspace=0.0)
-    plt.savefig('Edot_Ldot_edot.pdf', dpi=800, pad_inches=0.1, bbox_inches='tight')
+    # plt.savefig('Edot_Ldot_edot_comp.pdf', dpi=800, pad_inches=0.1, bbox_inches='tight')
     plt.show()
 
 
