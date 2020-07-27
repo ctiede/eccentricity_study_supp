@@ -18,7 +18,6 @@ for f in args.filenames:
     print(f)
     h5f = h5py.File(f, 'r') 
 
-
     # Scalar
     e = h5f['eccentricity'][...]
     n = h5f['radial_bins' ][...]
@@ -41,7 +40,6 @@ for f in args.filenames:
     T = h5f['remapped_Ldot' ][...]
     P = h5f['remapped_Edot' ][...]
 
-
     avg_sigma_moment = np.mean(em)
     avg_vr_moment    = np.mean(ev)
 
@@ -52,7 +50,6 @@ for f in args.filenames:
     avg_sigma_map = np.mean(S, axis=2)
     avg_Ldot_map  = np.mean(T, axis=2)
     avg_Edot_map  = np.mean(P, axis=2)
-
 
     if e < 0.1:
         ecc = str(e).split('.')[-1]
@@ -73,4 +70,6 @@ for f in args.filenames:
     h5w['remapped_Ldot']  = avg_Ldot_map
     h5w['remapped_Edot']  = avg_Edot_map
     h5w.close()
+
+
 
