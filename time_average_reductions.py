@@ -8,80 +8,69 @@ import numpy as np
 from eccentricity_study import *
 
 
+
+
 parser = ArgumentParser()
-parser.add_argument("directory", default='./')
-args  = parser.parse_args()
-files = sorted(glob.glob(args.directory + 'reductions.*.h5', recursive=False))
+parser.add_argument("filenames", nargs='+', help="set of stacked_reduction.h5 files to time average")
+args = parser.parse_args()
 
-mean_anomaly      = []
-eccentric_anomaly = []
-true_anomaly      = []
-sigma             = []
-work_on           = []
-torque_on         = []
-remapped_sigma    = []
-remapped_Ldot     = []
-remapped_Edot     = []
-sigma_moment      = []
-vr_moment         = []
+for f in args.filenames:
+    print(f)
+    h5f = h5py.File(f, 'r') 
 
-for fname in files:
-    print(fname)
+
+    # Scalar
+    e = h5f['eccentricity'][...]
+    n = h5f['radial_bins' ][...]
+    # m = h5f['bins_2d'][...]
     
-    try:
-        h5f = h5py.File(fname, 'r')
-    except:
-        print("\t Failed load:", fname)
-        continue
-
-    e = h5f['eccentricity'     ][...]
+    # 1D arrays
     M = h5f['mean_anomaly'     ][...]
     E = h5f['eccentric_anomaly'][...]
     f = h5f['true_anomaly'     ][...]
+    em = h5f['sigma_moment'][...]
+    ev = h5f['vr_moment'   ][...]
 
-    n = h5f['radial_bins'][...]
+    # 2D arrays
     s = h5f['sigma'      ][...]
     p = h5f['work_on'    ][...]
     t = h5f['torque_on'  ][...]
 
-    # m = h5f['bins_2d'][...]
+    # 3D maps
     S = h5f['remapped_sigma'][...]
     T = h5f['remapped_Ldot' ][...]
     P = h5f['remapped_Edot' ][...]
 
-    em = h5f['sigma_moment'][...]
-    ev = h5f['vr_moment'   ][...]
 
-    mean_anomaly.append     (M)
-    eccentric_anomaly.append(E)
-    true_anomaly.append     (f)
-    sigma.append            (s)
-    work_on.append          (p)
-    torque_on.append        (t)
-    remapped_sigma.append   (S)
-    remapped_Ldot.append    (T)
-    remapped_Edot.append    (P)
-    sigma_moment.append     (em)
-    vr_moment.append        (ev)
+    avg_sigma_moment = np.mean(em)
+    avg_vr_moment    = np.mean(ev)
 
-if e < 0.1:
-    ecc = str(e).split('.')[-1]
-else:
-    ecc = str(int(e * 1e3))
-output_fname = 'time_averages_{}.h5'.format(ecc)
+    avg_sigma_profile = np.mean(s, axis=0)
+    avg_work_profile  = np.mean(p, axis=0)
+    avg_torq_profile  = np.mean(t, axis=0)
 
-print('   Writing output')
-h5w = h5py.File(output_fname, 'w')
-h5w['eccentricity']      = e
-h5w['radial_bins']       = n
-h5w['mean_anomaly']      = np.array(mean_anomaly) 
-h5w['eccentric_anomaly'] = np.array(eccentric_anomaly)
-h5w['true_anomaly']      = np.array(true_anomaly)
-h5w['sigma_moment']      = np.array(sigma_moment)
-h5w['vr_moment']         = np.array(vr_moment)
-h5w['sigma']             = np.row_stack(sigma)
-h5w['work_on']           = np.row_stack(work_on)
-h5w['torque_on']         = np.row_stack(torque_on)
-h5w['remapped_sigma']    = np.dstack(remapped_sigma)
-h5w['remapped_Ldot']     = np.dstack(remapped_Ldot)
-h5w['remapped_Edot']     = np.dstack(remapped_Edot)
+    avg_sigma_map = np.mean(S, axis=2)
+    avg_Ldot_map  = np.mean(T, axis=2)
+    avg_Edot_map  = np.mean(P, axis=2)
+
+
+    if e < 0.1:
+        ecc = str(e).split('.')[-1]
+    else:
+        ecc = str(int(e * 1e3))
+    output_fname = 'time_avg_reductions_{}.h5'.format(ecc)
+
+    print('   writing', output_fname)
+    h5w = h5py.File(output_fname, 'w')
+    h5w['eccentricity']   = e
+    h5w['radial_bins']    = n
+    h5w['sigma_moment']   = avg_sigma_moment
+    h5w['vr_moment']      = avg_vr_moment
+    h5w['sigma']          = avg_sigma_profile
+    h5w['work_on']        = avg_work_profile
+    h5w['torque_on']      = avg_torq_profile
+    h5w['remapped_sigma'] = avg_sigma_map
+    h5w['remapped_Ldot']  = avg_Ldot_map
+    h5w['remapped_Edot']  = avg_Edot_map
+    h5w.close()
+
