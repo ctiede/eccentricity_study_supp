@@ -22,7 +22,7 @@ for f in args.filenames:
     e = h5f['eccentricity'][...]
     n = h5f['radial_bins' ][...]
     # m = h5f['bins_2d'][...]
-    
+
     # 1D arrays
     M = h5f['mean_anomaly'     ][...]
     E = h5f['eccentric_anomaly'][...]
@@ -70,6 +70,3 @@ for f in args.filenames:
     h5w['remapped_Ldot']  = avg_Ldot_map
     h5w['remapped_Edot']  = avg_Edot_map
     h5w.close()
-
-
-
