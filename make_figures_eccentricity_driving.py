@@ -93,21 +93,49 @@ def edot_times_r3_orbit_averaged_corotating(delta=0.0, eccentricity=1e-3, radius
 
 
 def plot_edot_map_at_true_anomaly(ax, true_anomaly, eccentricity=1e-3, show_orbiting_masses=True, component_size=150, radius=2.5):
-    xs = np.linspace(-3, 3, 400)
-    ys = np.linspace(-3, 3, 400)
-    X, Y = np.meshgrid(xs, ys)
     R = radius
+    xs = np.linspace(-R, R, 400)
+    ys = np.linspace(-R, R, 400)
+    X, Y = np.meshgrid(xs, ys)
     edot, (x1, y1), (x2, y2) = edot_times_r3_from_unit_point_mass_at_position(eccentricity, true_anomaly, X, Y, rs=0.01, return_positions=True)
+    extent = [-R, R, -R, R]
     levels = np.linspace(-3.5, 3.5, 9)
     ax.set_aspect('equal')
-    ax.contourf(edot, extent=[-R, R, -R, R], levels=levels, cmap='Spectral_r', zorder=0)
-    ax.contour (edot, extent=[-R, R, -R, R], levels=levels, colors='gray', linewidths=0.5, zorder=1)
+    ax.contourf(edot, extent=extent, levels=levels, cmap='Spectral_r', zorder=0)
+    ax.contour (edot, extent=extent, levels=levels, colors='gray', linewidths=0.5, zorder=1)
     ax.scatter([x1, x2], [y1, y2], c='k', s=component_size, zorder=2)
 
     if show_orbiting_masses:
         r = 2**(2/3) # 1.587, radius where gas orbits at 1/2 Omega_bin
         phi = true_anomaly * 0.5 - np.array([3/8, 7/8]) * 2 * np.pi
         ax.scatter(r * np.cos(phi), r * np.sin(phi), marker='+', c='purple', s=200)
+
+
+
+
+def plot_edot_map_at_true_anomaly_closeup(ax, true_anomaly, eccentricity=1e-3, component_size=150, radius=0.5):
+    R = radius
+    edot, (x1, y1), (x2, y2) = edot_times_r3_from_unit_point_mass_at_position(eccentricity, true_anomaly, 0.0, 0.0, return_positions=True)
+    # extent = [x1 - R, x1 + R, y1 - R, y1 + R]
+    extent = [-R, R, -R, R]
+    xs = np.linspace(extent[0], extent[1], 400)
+    ys = np.linspace(extent[2], extent[3], 400)
+    X, Y = np.meshgrid(xs, ys)
+    edot = edot_times_r3_from_unit_point_mass_at_position(eccentricity, true_anomaly, X, Y, rs=0.01)
+
+    levels = np.linspace(-3, 3, 47)
+    edot[edot < levels[ 0]] = levels[ 0]
+    edot[edot > levels[-1]] = levels[-1]
+
+    ax.set_aspect('equal')
+    ax.contourf(edot, extent=extent, levels=levels, cmap='Spectral_r', zorder=0)
+    ax.contour (edot, extent=extent, levels=levels, colors='gray', linewidths=0.5, zorder=1)
+    ax.scatter([x1, x2], [y1, y2], c='k', s=component_size, zorder=2)
+
+    # ax.arrow(0, 0, 0.5, 0.5, head_width=0.05, head_length=0.1, fc='k', ec='k')
+
+    ax.set_xlim(extent[0], extent[1])
+    ax.set_ylim(extent[2], extent[3])
 
 
 
@@ -184,12 +212,21 @@ def make_figure_edot_maps_eccentric():
 
 
 
+def make_figure_edot_maps_closeup():
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=[text_width, text_width])
+    n = 7
+    plot_edot_map_at_true_anomaly_closeup(ax, n * np.pi / 4, eccentricity=0.6, component_size=25, radius=0.2)
+    return fig
+
+
+
+
 def make_figure_first_and_second_order_in_e_terms():
     fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, figsize=[6.5, 6.5])
     fs = np.linspace(0.0, 2 * np.pi, 1000)
     e = 0.05
     r = 160.0
-    phi   = 0.12 * 2 * np.pi
+    phi = 0.12 * 2 * np.pi
     x = r * np.cos(phi)
     y = r * np.sin(phi)
     edots = [edot_times_r3_from_unit_point_mass_at_position(e, f, x, y) for f in fs]
@@ -232,8 +269,20 @@ def make_movie_edot_maps(filename, eccentricity=1e-3):
 
 
 
+def make_movie_edot_maps_closeup(filename, eccentricity=1e-3):
+    def plot_fn(fig, true_anomaly):
+        ax1 = fig.add_subplot(1, 1, 1)
+        plot_edot_map_at_true_anomaly_closeup(ax1, true_anomaly, eccentricity=eccentricity, component_size=25, radius=0.75)
+    fig = plt.figure(figsize=[10, 10])
+    fs = np.linspace(0.0, 2 * np.pi, 480)
+    make_movie(fig, plot_fn, fs, output=filename)
+
+
+
+
 # make_movie_edot_maps('edot_small_e.mp4', eccentricity=1e-3)
 # make_movie_edot_maps('edot_e_50.mp4', eccentricity=0.5)
+# make_movie_edot_maps_closeup('edot_closeup_e_50.mp4', eccentricity=0.5)
 
 
 
