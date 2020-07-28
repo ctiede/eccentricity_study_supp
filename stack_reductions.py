@@ -67,7 +67,7 @@ if e < 0.1:
     ecc = str(e).split('.')[-1]
 else:
     ecc = str(int(e * 1e3))
-output_fname = 'stacked_reductions_{}.h5'.format(ecc)
+output_fname = 'stacked_reductions_e{}.h5'.format(ecc)
 
 print('   Writing output')
 h5w = h5py.File(output_fname, 'w')
