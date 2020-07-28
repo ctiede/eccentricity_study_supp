@@ -84,4 +84,4 @@ if __name__ == '__main__':
         ecc.append (   e)
         decc.append(  de)
         edot.append(dedt)
-        np.save('e_de_dM.npy', np.column_stack([ecc, decc, edot]))
+        np.save('e_de_dedt.npy', np.column_stack([ecc, decc, edot]))
