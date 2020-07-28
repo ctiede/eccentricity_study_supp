@@ -28,7 +28,7 @@ rbin = 10. / 1000
 
 
 def E(e, M=1.0, a=1.0, mu=0.25):
-    return mu * M / 2. / a
+    return -mu * M / 2. / a
 
 
 
@@ -84,11 +84,11 @@ def plot_edot_ldot_single(ax, M, ecc, r, s, dE, dL, de):
     lab1 = 'Relative power, ' + r'$-(F_i \cdot v_i) \cdot t_\nu / 2E$'
     lab2 = 'Relative torque, ' + r'$\,(r_i \times F_i)_z \cdot t_\nu / L$'
 
-    # ax.plot(midpoint(r), smooth(Edot), lw=2, color=red , label=lab1)
-    # ax.plot(midpoint(r), smooth(Ldot), lw=2, color=blue, label=lab2)
-    plot_moving_average_mod(ax, midpoint(r), Edot, lw=2, color=red , label=lab1, window_size=10)
-    plot_moving_average_mod(ax, midpoint(r), Ldot, lw=2, color=blue, label=lab2, window_size=10)
-    plot_cumsum(ax, midpoint(r), Edot - Ldot, ls='--', lw=0.75, color='purple', label='Cumulative difference, ' + r'$\dot e$')
+    ax.plot(midpoint(r),-smooth(Edot), lw=2, color=red , label=lab1)
+    ax.plot(midpoint(r), smooth(Ldot), lw=2, color=blue, label=lab2)
+    # plot_moving_average_mod(ax, midpoint(r),-Edot, lw=2, color=red , label=lab1, window_size=10)
+    # plot_moving_average_mod(ax, midpoint(r), Ldot, lw=2, color=blue, label=lab2, window_size=10)
+    plot_cumsum(ax, midpoint(r), -Edot - Ldot, ls='--', lw=0.75, color='purple', label='Cumulative difference, ' + r'$\dot e$')
     ax.axhline(de * ecc / (1 - ecc**2) * t_nu, color='green', ls='--', label='Timeseries data, ' + r'$\dot e \cdot e t_\nu  / (1 - e^2)$')
 
 
@@ -176,10 +176,10 @@ def plot_edot_ldot(M, ecc, data, key):
     # plt.plot(eee, edot * t_nu)
     # plt.grid()
     # plt.show()
-    
+
     fig, axs = plt.subplots(len(ecc), 1, figsize=[8, 12], sharex=True)
     for e, ax, dat in zip(ecc, axs, data):
-        plot_edot_ldot_single(ax, M, e, (dat[0]), dat[1], dat[2], dat[3], edot[eee==e])
+        plot_edot_ldot_single(ax, M, e, dat[0], dat[1], dat[2], dat[3], edot[eee==e])
 
     config_axes(axs, key, ecc)
     axs[0].legend(loc="upper right", fontsize=12)
