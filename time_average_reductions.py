@@ -55,7 +55,7 @@ for f in args.filenames:
         ecc = str(e).split('.')[-1]
     else:
         ecc = str(int(e * 1e3))
-    output_fname = 'time_avg_reductions_{}.h5'.format(ecc)
+    output_fname = 'time_avg_reductions_e{}.h5'.format(ecc)
 
     print('   writing', output_fname)
     h5w = h5py.File(output_fname, 'w')
