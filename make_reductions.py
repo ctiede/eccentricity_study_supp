@@ -26,8 +26,8 @@ def r_cross_F(xh1, xh2, loc, mass, rsoft):
     y2  = loc - xh2[:, None, None, None]
     r1  = np.sqrt(y1[0] * y1[0] + y1[1] * y1[1])
     r2  = np.sqrt(y2[0] * y2[0] + y2[1] * y2[1])
-    fg1 = (mass / pow(r1**2 + rsoft**2, 3. / 2.)) * y1
-    fg2 = (mass / pow(r2**2 + rsoft**2, 3. / 2.)) * y2
+    fg1 = 0.5 * mass / pow(r1**2 + rsoft**2, 3. / 2.) * y1
+    fg2 = 0.5 * mass / pow(r2**2 + rsoft**2, 3. / 2.) * y2
     tg1 = np.cross(xh1, fg1, axis=0)
     tg2 = np.cross(xh2, fg2, axis=0)
     return tg1 + tg2
@@ -40,8 +40,8 @@ def F_dot_v(xh1, xh2, vh1, vh2, loc, mass, rsoft):
     y2  = loc - xh2[:, None, None, None]
     r1  = np.sqrt(y1[0] * y1[0] + y1[1] * y1[1])
     r2  = np.sqrt(y2[0] * y2[0] + y2[1] * y2[1])
-    fg1 = (mass / pow(r1**2 + rsoft**2, 3. / 2.)) * y1
-    fg2 = (mass / pow(r2**2 + rsoft**2, 3. / 2.)) * y2
+    fg1 = 0.5 * mass / pow(r1**2 + rsoft**2, 3. / 2.) * y1
+    fg2 = 0.5 * mass / pow(r2**2 + rsoft**2, 3. / 2.) * y2
     wg1 = np.tensordot(vh1, fg1, axes=1)
     wg2 = np.tensordot(vh2, fg2, axes=1)
     return wg1 + wg2
