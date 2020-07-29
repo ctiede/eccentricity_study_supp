@@ -56,7 +56,7 @@ if __name__ == '__main__':
         # Scalar
         e = h5f['eccentricity'][...]
         n = h5f['radial_bins' ][...]
-        m = h5f['bins_2d'][...]
+        # m = h5f['bins_2d'][...]
 
         # 1D arrays
         M = h5f['mean_anomaly'     ][...]
@@ -86,13 +86,13 @@ if __name__ == '__main__':
         h5w = h5py.File(output_fname, 'w')
         h5w.create_dataset('eccentricity', data=e)
         h5w.create_dataset('radial_bins' , data=n)
-        h52.create_dataset('bins_2d'     , data=m)
-        write_strobed_to_group(h5w.create_group('sigma_moment')  , M, em, 1)
-        write_strobed_to_group(h5w.create_group('vr_moment')     , M, ev, 1)
-        write_strobed_to_group(h5w.create_group('sigma')         , M, s , 2)
-        write_strobed_to_group(h5w.create_group('work_on')       , M, p , 2)
-        write_strobed_to_group(h5w.create_group('torque_on')     , M, t , 2)
-        write_strobed_to_group(h5w.create_group('remapped_sigma'), M, S , 3)
-        write_strobed_to_group(h5w.create_group('remapped_Ldot') , M, T , 3)
-        write_strobed_to_group(h5w.create_group('remapped_Edot') , M, P , 3)
+        # h52.create_dataset('bins_2d'     , data=m)
+        write_strobed_to_group(h5w.create_group('sigma_moment')  , em, 1)
+        write_strobed_to_group(h5w.create_group('vr_moment')     , ev, 1)
+        write_strobed_to_group(h5w.create_group('sigma')         , s , 2)
+        write_strobed_to_group(h5w.create_group('work_on')       , p , 2)
+        write_strobed_to_group(h5w.create_group('torque_on')     , t , 2)
+        write_strobed_to_group(h5w.create_group('remapped_sigma'), S , 3)
+        write_strobed_to_group(h5w.create_group('remapped_Ldot') , T , 3)
+        write_strobed_to_group(h5w.create_group('remapped_Edot') , P , 3)
         h5w.close()
