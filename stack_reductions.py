@@ -43,7 +43,7 @@ for fname in files:
     p = h5f['work_on'    ][...]
     t = h5f['torque_on'  ][...]
 
-    # m = h5f['bins_2d'][...]
+    m = h5f['bins_2d'][...]
     S = h5f['remapped_sigma'][...]
     T = h5f['remapped_Ldot' ][...]
     P = h5f['remapped_Edot' ][...]
