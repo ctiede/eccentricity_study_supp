@@ -130,13 +130,13 @@ def load_radial_data(fname):
 
 def get_radial_series(key):
     ecc  = [0.025, 0.1, 0.3, 0.4, 0.5, 0.6, 0.75]
-    e025 = load_radial_data('./Data/time_avg_reductions_e025.h5')
-    e100 = load_radial_data('./Data/time_avg_reductions_e100.h5')
-    e300 = load_radial_data('./Data/time_avg_reductions_e300.h5')
-    e400 = load_radial_data('./Data/time_avg_reductions_e400.h5')
-    e500 = load_radial_data('./Data/time_avg_reductions_e500.h5')
-    e600 = load_radial_data('./Data/time_avg_reductions_e600.h5')
-    e750 = load_radial_data('./Data/time_avg_reductions_e750.h5')
+    e025 = load_radial_data('./Data/fulls/time_avg_reductions_e025.h5')
+    e100 = load_radial_data('./Data/full/time_avg_reductions_e100.h5')
+    e300 = load_radial_data('./Data/full/time_avg_reductions_e300.h5')
+    e400 = load_radial_data('./Data/full/time_avg_reductions_e400.h5')
+    e500 = load_radial_data('./Data/full/time_avg_reductions_e500.h5')
+    e600 = load_radial_data('./Data/full/time_avg_reductions_e600.h5')
+    e750 = load_radial_data('./Data/full/time_avg_reductions_e750.h5')
     data = [e025, e100, e300, e400, e500, e600, e750]
     return ecc, data
 
