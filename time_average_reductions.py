@@ -10,6 +10,13 @@ from eccentricity_study import *
 
 
 
+def write_moments_to_group(group, moments):
+    group['avg_modulus' ] = np.mean(np.absolute(moments))
+    group['phase_series'] = np.angle(moments)
+
+
+
+
 def write_strobed_to_group(group, data, dim):
     if dim == 1:
         group['periapse'] = np.mean(data[7::8])
@@ -87,10 +94,10 @@ if __name__ == '__main__':
         h5w.create_dataset('eccentricity', data=e)
         h5w.create_dataset('radial_bins' , data=n)
         # h52.create_dataset('bins_2d'     , data=m)
+        write_moments_to_group(h5w.create_group('sigma_moment')  , em, 1)
+        write_moments_to_group(h5w.create_group('vr_moment')     , ev, 1)
         write_strobed_to_group(h5w.create_group('mean_anomaly')  , M , 1)
         write_strobed_to_group(h5w.create_group('true_anomaly')  , f , 1)
-        write_strobed_to_group(h5w.create_group('sigma_moment')  , em, 1)
-        write_strobed_to_group(h5w.create_group('vr_moment')     , ev, 1)
         write_strobed_to_group(h5w.create_group('sigma')         , s , 2)
         write_strobed_to_group(h5w.create_group('work_on')       , p , 2)
         write_strobed_to_group(h5w.create_group('torque_on')     , t , 2)
