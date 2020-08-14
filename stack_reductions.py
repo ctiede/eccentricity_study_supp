@@ -24,6 +24,8 @@ remapped_Ldot     = []
 remapped_Edot     = []
 sigma_moment      = []
 vr_moment         = []
+sigma_moment_m2   = []
+vr_moment_m2      = []
 
 for fname in files:
     try:
@@ -48,8 +50,10 @@ for fname in files:
     T = h5f['remapped_Ldot' ][...]
     P = h5f['remapped_Edot' ][...]
 
-    em = h5f['sigma_moment'][...]
-    ev = h5f['vr_moment'   ][...]
+    em  = h5f['sigma_moment']   [...]
+    ev  = h5f['vr_moment'   ]   [...]
+    em2 = h5f['sigma_moment_m2'][...]
+    ev2 = h5f['vr_moment_m2']   [...]
 
     mean_anomaly.append     (M)
     eccentric_anomaly.append(E)
@@ -62,6 +66,8 @@ for fname in files:
     remapped_Edot.append    (P)
     sigma_moment.append     (em)
     vr_moment.append        (ev)
+    sigma_moment_m2.append  (em2)
+    vr_moment_m2.append     (ev2)
 
 if e < 0.1:
     ecc = str(e).split('.')[-1]
@@ -73,11 +79,14 @@ print('   Writing output')
 h5w = h5py.File(output_fname, 'w')
 h5w['eccentricity']      = e
 h5w['radial_bins']       = n
+h5w['bins_2d']           = m
 h5w['mean_anomaly']      = np.array(mean_anomaly) 
 h5w['eccentric_anomaly'] = np.array(eccentric_anomaly)
 h5w['true_anomaly']      = np.array(true_anomaly)
 h5w['sigma_moment']      = np.array(sigma_moment)
 h5w['vr_moment']         = np.array(vr_moment)
+h5w['sigma_moment_m2']   = np.array(sigma_moment_m2)
+h5w['vr_moment_m2']      = np.array(vr_moment_m2)
 h5w['sigma']             = np.row_stack(sigma)
 h5w['work_on']           = np.row_stack(work_on)
 h5w['torque_on']         = np.row_stack(torque_on)

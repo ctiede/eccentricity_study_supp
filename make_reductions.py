@@ -122,7 +122,10 @@ def get_moments(fname, rin, rout):
     sigma_moment = np.sum(     dM * np.exp(1.j * phi)) / np.sum(dA)
     vr_moment    = np.sum(vr * dM * np.exp(1.j * phi)) / np.sum(vp * dM)
 
-    return dict(sigma_moment=sigma_moment, vr_moment=vr_moment)
+    sigma_moment_m2 = np.sum(     dM * np.exp(2.j * phi)) / np.sum(dA)
+    vr_moment_m2    = np.sum(vr * dM * np.exp(2.j * phi)) / np.sum(vp * dM)
+
+    return dict(sigma_moment=sigma_moment, vr_moment=vr_moment, sigma_moment_m2=sigma_moment_m2, vr_moment_m2=vr_moment_m2)
 
 
 

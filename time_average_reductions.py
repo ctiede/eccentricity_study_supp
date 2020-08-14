@@ -66,11 +66,13 @@ if __name__ == '__main__':
         # m = h5f['bins_2d'][...]
 
         # 1D arrays
-        M = h5f['mean_anomaly'     ][...]
-        E = h5f['eccentric_anomaly'][...]
-        f = h5f['true_anomaly'     ][...]
-        em = h5f['sigma_moment'][...]
-        ev = h5f['vr_moment'   ][...]
+        M   = h5f['mean_anomaly'     ][...]
+        E   = h5f['eccentric_anomaly'][...]
+        f   = h5f['true_anomaly'     ][...]
+        em  = h5f['sigma_moment']     [...]
+        ev  = h5f['vr_moment'   ]     [...]
+        em2 = h5f['sigma_moment_m2']  [...]
+        ev2 = h5f['vr_moment_m2'   ]  [...]
 
         # 2D arrays
         s = h5f['sigma'      ][...]
@@ -93,9 +95,11 @@ if __name__ == '__main__':
         h5w = h5py.File(output_fname, 'w')
         h5w.create_dataset('eccentricity', data=e)
         h5w.create_dataset('radial_bins' , data=n)
-        # h52.create_dataset('bins_2d'     , data=m)
-        write_moments_to_group(h5w.create_group('sigma_moment'), em)
-        write_moments_to_group(h5w.create_group('vr_moment')   , ev)
+        h52.create_dataset('bins_2d'     , data=m)
+        write_moments_to_group(h5w.create_group('sigma_moment')   , em)
+        write_moments_to_group(h5w.create_group('vr_moment')      , ev)
+        write_moments_to_group(h5w.create_group('sigma_moment_m2'), em2)
+        write_moments_to_group(h5w.create_group('vr_moment_m2')   , ev2)
         write_strobed_to_group(h5w.create_group('mean_anomaly')  , M , 1)
         write_strobed_to_group(h5w.create_group('true_anomaly')  , f , 1)
         write_strobed_to_group(h5w.create_group('sigma')         , s , 2)
