@@ -95,7 +95,7 @@ if __name__ == '__main__':
         h5w = h5py.File(output_fname, 'w')
         h5w.create_dataset('eccentricity', data=e)
         h5w.create_dataset('radial_bins' , data=n)
-        h52.create_dataset('bins_2d'     , data=m)
+        h5w.create_dataset('bins_2d'     , data=m)
         write_moments_to_group(h5w.create_group('sigma_moment')   , em)
         write_moments_to_group(h5w.create_group('vr_moment')      , ev)
         write_moments_to_group(h5w.create_group('sigma_moment_m2'), em2)
