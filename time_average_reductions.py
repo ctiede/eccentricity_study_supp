@@ -63,7 +63,7 @@ if __name__ == '__main__':
         # Scalar
         e = h5f['eccentricity'][...]
         n = h5f['radial_bins' ][...]
-        # m = h5f['bins_2d'][...]
+        m = h5f['bins_2d'][...]
 
         # 1D arrays
         M   = h5f['mean_anomaly'     ][...]
