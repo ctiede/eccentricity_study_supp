@@ -10,12 +10,15 @@ from eccentricity_study import *
 
 
 
-def get_moments(fname, rin, rout, corot=False):    
-    phi = get_dataset(fname, 'phi')
-    vr  = get_dataset(fname, 'radial_velocity')
-    vp  = get_dataset(fname, 'phi_velocity')
-    dA  = get_dataset(fname, 'cell_area')
-    dM  = get_dataset(fname, 'cell_mass')
+def get_moments(fname, rin, rout, corot=False): 
+    R   = get_dataset(fname, 'radius')   
+    cut = np.where((R > rin)&(R < rout))
+
+    phi = get_dataset(fname, 'phi')[cut]
+    vr  = get_dataset(fname, 'radial_velocity')[cut]
+    vp  = get_dataset(fname, 'phi_velocity')[cut]
+    dA  = get_dataset(fname, 'cell_area')[cut]
+    dM  = get_dataset(fname, 'cell_mass')[cut]
     
     theta = phi
     if corot is True:

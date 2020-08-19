@@ -112,18 +112,24 @@ def get_2d_maps(fname, nbins):
 
 
 
-def get_moments(fname, rin, rout):    
-    phi = get_dataset(fname, 'phi')
-    vr  = get_dataset(fname, 'radial_velocity')
-    vp  = get_dataset(fname, 'phi_velocity')
-    dA  = get_dataset(fname, 'cell_area')
-    dM  = get_dataset(fname, 'cell_mass')
+def get_moments(fname, rin, rout):
+    R   = get_dataset(fname, 'radius')   
+    cut = np.where((R > rin)&(R < rout))    
+
+    phi = get_dataset(fname, 'phi')[cut]
+    vr  = get_dataset(fname, 'radial_velocity')[cut]
+    vp  = get_dataset(fname, 'phi_velocity')[cut]
+    dA  = get_dataset(fname, 'cell_area')[cut]
+    dM  = get_dataset(fname, 'cell_mass')[cut]
 
     sigma_moment = np.sum(     dM * np.exp(1.j * phi)) / np.sum(dA)
     vr_moment    = np.sum(vr * dM * np.exp(1.j * phi)) / np.sum(vp * dM)
 
     nu    = get_true_anomaly(fname)
     theta = phi - nu
+
+    # print(phi.shape)
+    # print(phi[0][0][0], nu, theta[0][0][0])
     sigma_moment_m2 = np.sum(     dM * np.exp(2.j * theta)) / np.sum(dA)
     vr_moment_m2    = np.sum(vr * dM * np.exp(2.j * theta)) / np.sum(vp * dM)
 
