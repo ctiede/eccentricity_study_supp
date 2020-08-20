@@ -10,7 +10,7 @@ from eccentricity_study import *
 
 
 
-def get_moments(fname, rin, rout, corot=False): 
+def get_moments(fname, rin, rout): 
     R   = get_dataset(fname, 'radius')   
     cut = np.where((R > rin)&(R < rout))
 
@@ -20,15 +20,10 @@ def get_moments(fname, rin, rout, corot=False):
     dA  = get_dataset(fname, 'cell_area')[cut]
     dM  = get_dataset(fname, 'cell_mass')[cut]
 
-    theta = phi
-    if corot is True:
-        nu    = get_true_anomaly(fname)
-        theta = phi - nu
-
-    sigma_moment    = np.sum(     dM * np.exp(1.j * theta)) / np.sum(dA)
-    sigma_moment_m2 = np.sum(     dM * np.exp(2.j * theta)) / np.sum(dA)
-    vr_moment       = np.sum(vr * dM * np.exp(1.j * theta)) / np.sum(vp * dM)
-    vr_moment_m2    = np.sum(vr * dM * np.exp(2.j * theta)) / np.sum(vp * dM)
+    sigma_moment    = np.sum(     dM * np.exp(1.j * phi)) / np.sum(dA)
+    sigma_moment_m2 = np.sum(     dM * np.exp(2.j * phi)) / np.sum(dA)
+    vr_moment       = np.sum(vr * dM * np.exp(1.j * phi)) / np.sum(vp * dM)
+    vr_moment_m2    = np.sum(vr * dM * np.exp(2.j * phi)) / np.sum(vp * dM)
 
     return dict(sigma_moment=sigma_moment, vr_moment=vr_moment, sigma_moment_m2=sigma_moment_m2, vr_moment_m2=vr_moment_m2)
 
@@ -49,11 +44,9 @@ def make_moment_files(args):
     print('Making moment files')
     for fname in args.filenames:
         print(fname)
-        corot = dict()
-        inert = dict()
-
-        corot.update(get_moments(fname, args.moment_cut_in, args.moment_cut_out, corot=True))
-        inert.update(get_moments(fname, args.moment_cut_in, args.moment_cut_out, corot=False))
+        dset = dict()
+        dset.update(get_moments(fname, args.moment_cut_in, args.moment_cut_out))
+        dset.update(meta_data(fname))
 
         if len(fname.split('/')) == 1:
             output_filename = fname.replace('diagnostics', '__moments__')
@@ -62,16 +55,8 @@ def make_moment_files(args):
 
         print(f'     writing', output_filename)
         h5f = h5py.File(output_filename, 'w')
-        gco = h5f.create_group('corot')
-        gin = h5f.create_group('inert')
-        
-        for key, value in corot.items():
-            gco[key] = value
-        for key, value in inert.items():
-            gin[key] = value
 
-        extras = meta_data(fname)
-        for key, value in extras.items():
+        for key, value in dset.items():
             h5f[key] = value
 
 
@@ -84,15 +69,11 @@ def stack_moment_files():
     mean_anomaly      = []
     eccentric_anomaly = []
     true_anomaly      = []
-    s_moment_corot    = []
-    v_moment_corot    = []
-    s_moment_inert    = []
-    v_moment_inert    = []
-    s_moment_m2_corot = []
-    v_moment_m2_corot = []
-    s_moment_m2_inert = []
-    v_moment_m2_inert = []
-
+    s_moment          = []
+    v_moment          = []
+    s_moment_m2       = []
+    v_moment_m2       = []
+    
     for fname in files:
         try:
             h5f = h5py.File(fname, 'r')
@@ -106,24 +87,15 @@ def stack_moment_files():
         E = h5f['eccentric_anomaly'][...]
         f = h5f['true_anomaly'     ][...]
 
-        em_c  = h5f['corot']['sigma_moment']   [...]
-        ev_c  = h5f['corot']['vr_moment'   ]   [...]
-        em2_c = h5f['corot']['sigma_moment_m2'][...]
-        ev2_c = h5f['corot']['vr_moment_m2']   [...]
+        em_c  = h5f['sigma_moment']   [...]
+        ev_c  = h5f['vr_moment'   ]   [...]
+        em2_c = h5f['sigma_moment_m2'][...]
+        ev2_c = h5f['vr_moment_m2']   [...]
 
-        em_i  = h5f['inert']['sigma_moment']   [...]
-        ev_i  = h5f['inert']['vr_moment'   ]   [...]
-        em2_i = h5f['inert']['sigma_moment_m2'][...]
-        ev2_i = h5f['inert']['vr_moment_m2']   [...]
-
-        s_moment_corot.append(em_c)
-        v_moment_corot.append(ev_c)
-        s_moment_inert.append(em_i)
-        v_moment_inert.append(ev_i)
-        s_moment_m2_corot.append(em2_c)
-        v_moment_m2_corot.append(ev2_c)
-        s_moment_m2_inert.append(em2_i)
-        v_moment_m2_inert.append(ev2_i)
+        s_moment.append(em_c)
+        v_moment.append(ev_c)
+        s_moment_m2.append(em2_c)
+        v_moment_m2.append(ev2_c)
         os.remove(fname)
 
     if e < 0.1:
@@ -134,20 +106,14 @@ def stack_moment_files():
 
     print('   Writing output')
     h5w = h5py.File(output_fname, 'w')
-    gco = h5w.create_group('corot')
-    gin = h5w.create_group('inert')
     h5w['eccentricity']      = e
     h5w['mean_anomaly']      = np.array(mean_anomaly) 
     h5w['eccentric_anomaly'] = np.array(eccentric_anomaly)
     h5w['true_anomaly']      = np.array(true_anomaly)
-    gco['sigma_moment']      = np.array(s_moment_corot)
-    gco['vr_moment']         = np.array(v_moment_corot)
-    gco['sigma_moment_m2']   = np.array(s_moment_m2_corot)
-    gco['vr_moment_m2']      = np.array(v_moment_m2_corot)
-    gin['sigma_moment']      = np.array(s_moment_inert)
-    gin['vr_moment']         = np.array(v_moment_inert)
-    gin['sigma_moment_m2']   = np.array(s_moment_m2_inert)
-    gin['vr_moment_m2']      = np.array(v_moment_m2_inert)
+    h5w['sigma_moment']      = np.array(s_moment)
+    h5w['vr_moment']         = np.array(v_moment)
+    h5w['sigma_moment_m2']   = np.array(s_moment_m2)
+    h5w['vr_moment_m2']      = np.array(v_moment_m2)
 
 
 
