@@ -19,7 +19,7 @@ def get_moments(fname, rin, rout, corot=False):
     vp  = get_dataset(fname, 'phi_velocity')[cut]
     dA  = get_dataset(fname, 'cell_area')[cut]
     dM  = get_dataset(fname, 'cell_mass')[cut]
-    
+
     theta = phi
     if corot is True:
         nu    = get_true_anomaly(fname)
@@ -27,9 +27,8 @@ def get_moments(fname, rin, rout, corot=False):
 
     sigma_moment    = np.sum(     dM * np.exp(1.j * theta)) / np.sum(dA)
     sigma_moment_m2 = np.sum(     dM * np.exp(2.j * theta)) / np.sum(dA)
-
-    vr_moment    = np.sum(vr * dM * np.exp(1.j * theta)) / np.sum(vp * dM)
-    vr_moment_m2 = np.sum(vr * dM * np.exp(2.j * theta)) / np.sum(vp * dM)
+    vr_moment       = np.sum(vr * dM * np.exp(1.j * theta)) / np.sum(vp * dM)
+    vr_moment_m2    = np.sum(vr * dM * np.exp(2.j * theta)) / np.sum(vp * dM)
 
     return dict(sigma_moment=sigma_moment, vr_moment=vr_moment, sigma_moment_m2=sigma_moment_m2, vr_moment_m2=vr_moment_m2)
 
@@ -57,30 +56,30 @@ def make_moment_files(args):
         inert.update(get_moments(fname, args.moment_cut_in, args.moment_cut_out, corot=False))
 
         if len(fname.split('/')) == 1:
-            output_filename = fname.replace('diagnostics', '__moments')
+            output_filename = fname.replace('diagnostics', '__moments__')
         else:
-            output_filename = (fname.split('/')[-1]).replace('diagnostics', '__moments')
+            output_filename = (fname.split('/')[-1]).replace('diagnostics', '__moments__')
 
         print(f'     writing', output_filename)
         h5f = h5py.File(output_filename, 'w')
-        g_co = h5f.create_group('corot')
-        g_in = h5f.create_group('inert')
+        gco = h5f.create_group('corot')
+        gin = h5f.create_group('inert')
+        
+        for key, value in corot.items():
+            gco[key] = value
+        for key, value in inert.items():
+            gin[key] = value
 
         extras = meta_data(fname)
         for key, value in extras.items():
             h5f[key] = value
 
-        for key, value in corot.items():
-            g_co[key] = value
-
-        for key, value in inert.items():
-            g_in[key] = value
 
 
 
 def stack_moment_files():
     print('Stacking moment files')
-    files = sorted(glob.glob('./' + '__moments.*.h5', recursive=False))
+    files = sorted(glob.glob('./' + '__moments__.*.h5', recursive=False))
 
     mean_anomaly      = []
     eccentric_anomaly = []
@@ -125,7 +124,6 @@ def stack_moment_files():
         v_moment_m2_corot.append(ev2_c)
         s_moment_m2_inert.append(em2_i)
         v_moment_m2_inert.append(ev2_i)
-
         os.remove(fname)
 
     if e < 0.1:
@@ -150,7 +148,6 @@ def stack_moment_files():
     gin['vr_moment']         = np.array(v_moment_inert)
     gin['sigma_moment_m2']   = np.array(s_moment_m2_inert)
     gin['vr_moment_m2']      = np.array(v_moment_m2_inert)
-
 
 
 
